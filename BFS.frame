@@ -1,0 +1,28 @@
+
+int BFS(Node start, Node target)
+{
+  Queue<Node> q; //core data
+  set<Node> visited; //
+
+  q.offer(start);
+  visited.add(start);
+
+  int step = 0;
+
+  while (q not empty) {
+    int sz = q.size();
+    for (int i = 0; i < sz; i++) {
+      Node cur = q.poll();
+      if (cur is target) {
+        return step;
+      }
+      for (Node x : cur.adj()) {
+        if (x not in visited() {
+          q.offer(x);
+          visited.add(x);
+        }
+      }
+    }
+  }
+  ++step;
+}

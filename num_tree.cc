@@ -1,0 +1,21 @@
+#include <stdio.h>
+
+int numTrees(int n)
+{ 
+  int* G = new int[n+1];
+  G[0] = 1;
+  G[1] = 1;
+  for (int i=2; i <= n; ++i) {
+    for (int j=0; j <= i; ++j)
+      G[i] += G[j-1] * G[i-j];
+  }
+  return G[n];
+}
+
+int main()
+{
+  printf("%d\n", numTrees(3));
+  printf("%d\n", numTrees(10));
+  printf("%d\n", numTrees(1100));
+  return 0;
+}
