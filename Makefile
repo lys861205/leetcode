@@ -4,6 +4,7 @@ CXXFLAGS=-g -std=c++11
 SRCS=$(wildcard *.cc)
 BINS=$(patsubst %.cc, %, $(SRCS))
 
+
 all:$(BINS) 
 
 $(BIN):%:%.cc

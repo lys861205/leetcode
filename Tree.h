@@ -63,9 +63,9 @@ void Print(Tree* root, int s, char c) {
   if (NULL == root) {
     return ;
   }
-  Print(root->left, s+3, '/');
+  Print(root->right, s+3, '/');
   cout << setw(s) << c << root->value << endl;
-  Print(root->right, s+3, '\\');
+  Print(root->left, s+3, '\\');
 }
 
 void Print(Tree* root) {
