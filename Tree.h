@@ -9,6 +9,7 @@ struct Tree {
   int value;
   Tree* left;
   Tree* right;
+  Tree* next;
 };
 
 Tree* BSTCreate(int value) 
