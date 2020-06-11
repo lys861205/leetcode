@@ -8,6 +8,7 @@
 
 using namespace std;
 
+/*
 bool Match(Tree* root, Tree* p, stack<Tree*>& st)
 {
   if (!root) return false;
@@ -23,6 +24,7 @@ bool Match(Tree* root, Tree* p, stack<Tree*>& st)
   st.pop(root);
   return false;
 }
+*/
 
 Tree* lowestCommonParent(Tree* root, Tree* p, Tree* q)
 {
@@ -39,4 +41,9 @@ Tree* lowestCommonParent(Tree* root, Tree* p, Tree* q)
   else if (r_parent != NULL) {
     return r_parent;
   }
+}
+
+int main()
+{
+  return 0;
 }
