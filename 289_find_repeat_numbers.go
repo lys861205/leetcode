@@ -5,17 +5,27 @@ import "fmt"
 func repeatNumber(nums []int) int {
   fast := 0
   slow := 0
+  slow = nums[slow]
+  fast = nums[nums[fast]]
   for {
-    if fast != slow && nums[fast] == nums[slow] {
-      return nums[fast]
+    if slow != fast {
+      slow = nums[slow]
+      fast = nums[nums[fast]]
     } else {
-      fast += 2
-      slow += 1
+      break
     }
-    fast = fast%len(nums)
-    slow = slow%len(nums)
-    fmt.Printf("%d-%d\n", slow, fast)
   }
+  pre1 := 0
+  pre2 := slow
+  for {
+    if pre1 != pre2 {
+      pre1 = nums[pre1]
+      pre2 = nums[pre2]
+    } else {
+      break
+    }
+  }
+  return pre1
 }
 
 func main() {
