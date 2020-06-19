@@ -1,4 +1,37 @@
 #include <stdio.h>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+string longestPailndrome(string s)
+{
+  int size = s.size();
+  int maxlen = 0;
+  int start = 0;
+  vector<vector<int> > dp(size, vector<int>(size, 0));
+  for (int r=1; r < size; ++r) {
+    for (int l=0; l < r; ++l) {
+      if (s[r] == s[l]) {
+        if (r-l < 3) {
+          dp[l][r] = true;
+        } else {
+          dp[l][r] =  dp[l+1][r-1];
+        }
+      } else {
+        dp[l][r] = false;
+      }
+
+      if (dp[l][r]) {
+        if ((r-l) > maxlen) {
+          maxlen = r-l;
+          start = l;
+        }
+      }
+    }
+  }
+  return s.substr(start, maxlen);
+}
 
 int longestPailndrome(const char* s, int n)
 {
