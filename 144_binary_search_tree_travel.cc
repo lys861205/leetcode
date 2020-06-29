@@ -53,12 +53,14 @@ int main()
 
   vector<int> res;
   res = IteratorTravelTree(root);
+  PrintInIterate(root);
+  PrintIterate(root);
   //PreTravelTree(root, res);
-  printf("[");
-  for (size_t i=0; i < res.size(); ++i) {
-    printf("%d ", res[i]);
-  }
-  printf("]\n");
+  // printf("[");
+  // for (size_t i=0; i < res.size(); ++i) {
+  //   printf("%d ", res[i]);
+  // }
+  // printf("]\n");
   return 0;
 }
 

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <iomanip>
+#include <stack>
 
 using namespace std;
 
@@ -76,6 +77,40 @@ void Print(Tree* root) {
   printf("%d ", root->value);
   Print(root->left);
   Print(root->right);
+}
+
+void PrintIterate(Tree* root) {
+  Tree* t = root;
+  stack<Tree*> st;
+  while (t || !st.empty()) {
+    if (t) {
+      printf("%d ", t->value);
+      st.push(t);
+      t = t->left;
+    } else {
+      t = st.top(); 
+      st.pop();
+      t = t->right;
+    }
+  }
+  printf("\n");
+}
+
+void PrintInIterate(Tree* root) {
+  Tree* t = root;
+  stack<Tree*> st;
+  while (t || !st.empty()) {
+    if (t) {
+      st.push(t);
+      t = t->left;
+    } else {
+      t = st.top(); 
+      printf("%d ", t->value);
+      st.pop();
+      t = t->right;
+    }
+  }
+  printf("\n");
 }
 
 void BSTRelese(Tree* root) 
