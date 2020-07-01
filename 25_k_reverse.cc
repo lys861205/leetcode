@@ -20,6 +20,13 @@ Node* reverse(Node* head)
 Node* reverseKGroup2(Node* head, int k)
 {
   Node* temp = head;  
+  /*
+  int i = 0; 
+  while (i < k && temp) {
+    temp = temp->next;
+    ++i;
+  }
+  */
   for (int i = 1; i < k && temp != NULL; ++i)
   {
     temp = temp->next;

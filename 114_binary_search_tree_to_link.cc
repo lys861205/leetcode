@@ -39,6 +39,16 @@ void flatten2(Tree* root)
 
 int main()
 {
+  Tree* root = BSTCreate(5); 
+  root = BSTAdd(root, 4);
+  root = BSTAdd(root, 6);
+  Print(root, 3, '*');
+  flatten(root);
+  while(root) {
+    printf("%d ", root->value); 
+    root = root->right;
+  }
+  printf("\n");
   return 0;
 }
 
