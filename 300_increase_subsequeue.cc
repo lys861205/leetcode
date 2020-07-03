@@ -14,7 +14,7 @@ int lengthOfLIS(vector<int>& nums)
   for (size_t i = 0; i < nums.size(); ++i) {
     dp[i] = 1;
     for (size_t j=0; j < i; ++j) {
-      if (nums[i] < nums[j]) {
+      if (nums[i] > nums[j]) {
         dp[i] = max(dp[i], dp[j]+1);
       } else {
         //dp[i] = max(dp[i], dp[j]);
@@ -29,7 +29,7 @@ int lengthOfLIS(vector<int>& nums)
 
 int main()
 {
-  vector<int> nums = {10, 9, 2, 5, 3, 7, 101, 18};
+  vector<int> nums = {10, 9, 2, 5, 3, 7, 101,200, 18};
   printf("%d\n", lengthOfLIS(nums));
   return 0;
 }
