@@ -14,12 +14,23 @@ Node* Add(int value)
   return node;
 }
 
+int Len(Node* node) 
+{
+  Node* p = node;
+  int len = 0;
+  while (p) {
+    p = p->next;
+    ++len;
+  }
+  return len;
+}
+
 void Print(Node* node)
 {
   Node* p = node;
   while (p) {
-    printf("%d ", p->value);
+    printf("%d->", p->value);
     p = p->next;
   }
-  printf("\n");
+  printf("NULL\n");
 }
