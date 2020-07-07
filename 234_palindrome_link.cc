@@ -18,6 +18,25 @@ Node* reverse(Node* h){
   return pre;
 }
 
+//递归方法判断 时间复杂度O(n) 空间复杂度O(n)
+Node* left;
+
+bool traverse(Node* right) 
+{
+  if (nullptr == right) return true;
+  bool res = traverse(right->next);
+  res = res && (left->value == right->value);
+  left = left->next;
+  return res;
+}
+bool IsPalindrome(Node* h)
+{
+  left = h;
+  return traverse(h);
+}
+
+
+//快慢指针找到中点
 bool isPalindrome(Node* h)
 {
   if (!h) return true; 
@@ -27,29 +46,20 @@ bool isPalindrome(Node* h)
     slow = slow->next;
     fast = fast->next->next;
   }
-  slow = reverse(slow); 
+  if (fast) { //奇数个节点
+    slow = slow->next; 
+  }
+  Node* left = h;
+  Node* right = reverse(slow); 
   Print(h);
   Print(slow);
 
-  Node* p = h;
-  while (p && slow) {
-    if (p->value != slow->value){
+  while (right) {
+    if (left->value != right->value) {
       return false;
     }
-    p = p->next;
-    slow = slow->next;
-  }
-  int cnt = 0;
-  while (p) {
-    cnt++;
-    p = p->next;
-  } 
-  while (slow) {
-    cnt++;
-    slow = slow->next;
-  } 
-  if (cnt > 1) {
-    return false;
+    left = left->next;
+    right = right->next;
   }
   return true;
 }
@@ -64,10 +74,11 @@ int main()
     l1->next = l2;
     Node* l3 = Add(1);
     l2->next = l3;
-    Node* l4 = Add(1);
-    l3->next = l4;
+    //Node* l4 = Add(1);
+    //l3->next = l4;
   }
   Print(h);
-  printf("%d\n", isPalindrome(h));
+  //printf("%d\n", isPalindrome(h));
+  printf("%d\n", IsPalindrome(h));
   return 0;
 }
