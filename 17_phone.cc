@@ -41,8 +41,9 @@ std::vector<string> backstrace(string& s, int n)
 
 int main()
 {
-  std::string ss = "23456";
+  std::string ss = "2857496";
   vector<string> v = backstrace(ss, ss.size());
+  printf("size: %d\n", v.size());
   for (size_t i=0; i < v.size();++i) {
     printf("%s ", v[i].c_str());
   }
