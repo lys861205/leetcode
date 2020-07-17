@@ -4,17 +4,17 @@ GO=go
 GOFLAGS=build -gcflags '-N -l'
 
 SRCS=$(wildcard *.cc)
-BINS=$(patsubst %.cc, %, $(SRCS))
+BINS=$(addprefix bin/, $(patsubst %.cc, %, $(SRCS)))
 go_SRCS=$(wildcard *.go)
-go_BINS=$(patsubst %.go, %, $(go_SRCS))
+go_BINS=$(addprefix bin/, $(patsubst %.go, %, $(go_SRCS)))
 
 
 all:$(BINS) $(go_BINS)
 
-$(BIN):%:%.cc
+$(BINS):bin/%:%.cc
 	$(CXX) $< $(CXXFLAGS) -o $@ 
 
-$(go_BINS):%:%.go
+$(go_BINS):bin/%:%.go
 	$(GO) $(GOFLAGS) -o $@ $< 
 
 clean:

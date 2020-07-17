@@ -63,6 +63,7 @@ int main()
 {
   int a[] = {2,1,5,9,10,3,4,8,6,7};
   backstrace(a,10,0,88);
+  printf("=========================\n");
   onebackstrace(a,10,0,88);
   return 0;
 }
