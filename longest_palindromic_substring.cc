@@ -4,6 +4,44 @@
 
 using namespace std;
 
+string manacher(const string& s)
+{
+  string t("$#");
+  for (const char &ch : s) {
+    t += ch;
+    t += "#";
+  }
+  vector<int> p(t.size(), 0);
+  int C = 0;
+  int R = 0;
+  int maxlen = 0;
+  int centerIndex = 0;
+  for (int i=1; i < t.size(); ++i) {
+    int i_mirror = 2 * C - i;
+    if (R > i) {
+      p[i] = min(R-i, p[i_mirror]);
+    } else {
+      p[i] = 0;
+    }
+
+    while (t[i+1+p[i]] == t[i-1-p[i]]) {
+      p[i]++;
+    }
+
+    if (i+p[i] > R) {
+      C = i;
+      R = i + p[i];
+    }
+
+    if (p[i] > maxlen) {
+      maxlen = p[i];
+      centerIndex = i;
+    }
+  }
+  int start = (centerIndex - maxlen) / 2;
+  return s.substr(start, maxlen);
+}
+
 string longestPailndrome(string s)
 {
   int size = s.size();
@@ -74,5 +112,6 @@ int main()
   printf("%d\n", longestPailndrome(c, 4));
   const char* d = "abc";
   printf("%d\n", longestPailndrome(d, 3));
+  printf("%s\n", manacher("abcdcbaedff").c_str());
   return 0;
 }
