@@ -4,6 +4,8 @@
 struct Node {
   int value;
   Node* next;
+  Node():next(nullptr){}
+  Node(int value):value(value),next(nullptr){}
 };
 
 Node* Add(int value)
@@ -23,6 +25,39 @@ int Len(Node* node)
     ++len;
   }
   return len;
+}
+
+Node* Tail(Node* head)
+{
+  Node* cur = head;
+  Node* tail = nullptr;
+  while (cur) {
+    tail = cur;
+    cur = cur->next;
+  }
+  return tail;
+}
+
+void Insert(Node* &head, int value)
+{
+  Node* n = new Node(value);
+  n->next = head;
+  head = n;
+}
+
+void InsertTail(Node* &head, int value) 
+{
+  if (!head) {
+    head = new Node(value);
+    return;
+  }
+  Node* curr = head;
+  Node* prev = nullptr;
+  while (curr) {
+    prev = curr;
+    curr = curr->next;     
+  }
+  prev->next = new Node(value);
 }
 
 void Print(Node* node)
