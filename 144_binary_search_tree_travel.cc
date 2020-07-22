@@ -55,6 +55,8 @@ int main()
   res = IteratorTravelTree(root);
   PrintInIterate(root);
   PrintIterate(root);
+  PrintBackIterate(root);
+
   //PreTravelTree(root, res);
   // printf("[");
   // for (size_t i=0; i < res.size(); ++i) {

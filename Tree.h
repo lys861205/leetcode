@@ -8,6 +8,7 @@ using namespace std;
 
 struct Tree {
   int value;
+  bool first;
   Tree* left;
   Tree* right;
   Tree* next;
@@ -79,7 +80,7 @@ void Print(Tree* root) {
   Print(root->right);
 }
 
-void PrintIterate(Tree* root) {
+void PrintIterate(Tree* root) { //前序遍历
   Tree* t = root;
   stack<Tree*> st;
   while (t || !st.empty()) {
@@ -96,7 +97,7 @@ void PrintIterate(Tree* root) {
   printf("\n");
 }
 
-void PrintInIterate(Tree* root) {
+void PrintInIterate(Tree* root) { //中序遍历
   Tree* t = root;
   stack<Tree*> st;
   while (t || !st.empty()) {
@@ -107,6 +108,28 @@ void PrintInIterate(Tree* root) {
       t = st.top(); 
       printf("%d ", t->value);
       st.pop();
+      t = t->right;
+    }
+  }
+  printf("\n");
+}
+
+void PrintBackIterate(Tree* root) { //后序遍历
+  Tree* t = root;
+  stack<Tree*> st;
+  while (t || !st.empty()) {
+    if (t) {
+      st.push(t);
+      t = t->left;
+    } else {
+      t = st.top(); 
+      if (t->first || t->right == nullptr) {
+        st.pop();
+        printf("%d ", t->value);
+        t = nullptr;
+        continue;
+      }
+      t->first = true;
       t = t->right;
     }
   }
