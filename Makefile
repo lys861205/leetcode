@@ -1,5 +1,11 @@
+ifneq ($(compile), )
+CXX=$(compile)
+CXXFLAGS=-g -Wreturn-type -std=c++11
+else
 CXX=g++
 CXXFLAGS=-g -std=c++11
+endif
+
 GO=go
 GOFLAGS=build -gcflags '-N -l'
 
