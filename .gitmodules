@@ -1,3 +1,6 @@
 [submodule "CtCI-6th-Edition-cpp"]
 	path = CtCI-6th-Edition-cpp
 	url = https://github.com/careercup/CtCI-6th-Edition-cpp.git
+[submodule "test"]
+	path = test
+	url = https://github.com/lys861205/test.git
