@@ -10,9 +10,8 @@ Node* ListAddList(Node* head1, Node* head2)
   int carry = 0;
   Node* p = head1;
   Node* q = head2;
-  Node* new_head = nullptr;
-  Node* tmp = nullptr;
-  new_head = tmp;
+  Node dummy;
+  Node* cur = &dummy;
   while (p || q || carry) {
     int sum = 0;
     if (p && q) {
@@ -34,15 +33,10 @@ Node* ListAddList(Node* head1, Node* head2)
     carry = sum / 10;
     sum %= 10;
     Node* node = Add(sum);
-    if (tmp) {
-      tmp->next = node;
-    }
-    tmp = node;
-    if (!new_head) {
-      new_head = tmp;
-    }
+    cur->next = node;
+    cur = node;
   }
-  return new_head;
+  return dummy.next;
 }
 int main()
 {
