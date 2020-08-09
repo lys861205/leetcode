@@ -69,10 +69,7 @@ public:
   
   int use_count() const
   {
-    if (pn_) {
-      return pn_->use_count();
-    }
-    return 0;
+    return pn_ ? pn_->use_count() : 0;
   }
 
   pointer_t get() const 
