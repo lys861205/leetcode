@@ -42,8 +42,10 @@ public:
   {
     std::cout << "shared_ptr dtor " << std::endl;
     if (pn_ && 0 == pn_->sub_ref()) {
-      delete ptr_;
       std::cout << "delete memory" << std::endl;
+      delete ptr_;
+      std::cout << "delete referenct counter" << std::endl;
+      delete pn_;
     }
   }
 
