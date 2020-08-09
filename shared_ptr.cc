@@ -73,6 +73,11 @@ public:
     return 0;
   }
 
+  pointer_t get() const 
+  {
+    return ptr_;
+  }
+
   pointer_t operator->() const 
   {
     return ptr_;
