@@ -6,6 +6,11 @@ public:
   {
   }
 
+  shared_count(const shared_count& rh)
+  {
+    count_ = rh.count_;
+  }
+
   int add_ref() 
   {
     return count_++;
@@ -21,6 +26,7 @@ public:
   {
     return count_;
   }
+
 private:
   int count_;
 };
@@ -32,6 +38,10 @@ class shared_ptr
   typedef T& reference_t;
 
 public:
+  shared_ptr():ptr_(),pn_()
+  {
+  }
+
   shared_ptr(T* p):ptr_(p)
   {
     std::cout << "shared_ptr ator " << std::endl;
@@ -65,6 +75,23 @@ public:
     pn_ =  rh.pn_;
     pn_->add_ref();
     return *this;
+  }
+
+  void reset(T* p) 
+  {
+    shared_ptr<T> dummy;
+    dummy.swap(*this);
+    ptr_ = p;
+    pn_ = new shared_count(); 
+    pn_->add_ref();
+  }
+
+  void swap(shared_ptr<T>& other)
+  {
+    std::swap(ptr_, other.ptr_);
+    shared_count* temp_pn = pn_;
+    pn_ = other.pn_;
+    other.pn_ = temp_pn;
   }
   
   int use_count() const
@@ -109,11 +136,18 @@ private:
 
 int main()
 {
-  shared_ptr<A> p(new A(10));
-  shared_ptr<A> p1 = p;
-  std::cout << p1.use_count() << std::endl;
-  p1->test();
-  p->test();
-  (*p).test();
+  // shared_ptr<A> p(new A(10));
+  // shared_ptr<A> p1 = p;
+  // std::cout << p1.use_count() << std::endl;
+  // p1->test();
+  // p->test();
+  // (*p).test();
+  std::cout << "================================" << std::endl;
+  {
+    shared_ptr<A> p(new A(10));
+    p->test();
+    p.reset(new A(20));
+    p->test();
+  }
   return 0;
 }
