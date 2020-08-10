@@ -1,14 +1,16 @@
 #include <pthread.h>
-#include <boost/noncopyable.hpp>    // noncopyable
-#include <boost/checked_delete.hpp> // check_delete
+// #include <boost/noncopyable.hpp>    // noncopyable
+// #include <boost/checked_delete.hpp> // check_delete
 #include <cstdio>
 #include <cstdlib>
 #include <string>
 #include <stdexcept>
 
 template<typename T>
-class ThreadLocal : public boost::noncopyable
+class ThreadLocal //: public boost::noncopyable
 {
+  ThreadLocal(const ThreadLocal& other) = delete; 
+  ThreadLocal& operator=(const ThreadLocal& other) = delete; 
   public:
     typedef ThreadLocal<T>* pThreadLocal;
     ThreadLocal()
@@ -43,7 +45,10 @@ class ThreadLocal : public boost::noncopyable
     static void destroy( void* arg )
     { 
       T* obj = reinterpret_cast<T*>( arg );
-      boost::checked_delete( obj );
+      typedef char T_must_be_complete_type[sizeof(T) ? 0 : 1];
+      T_must_be_complete_type dummy;
+      delete obj;
+      //boost::checked_delete( obj );
     }
 
     pthread_key_t pkey_;
