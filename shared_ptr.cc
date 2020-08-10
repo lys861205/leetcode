@@ -2,33 +2,32 @@
 
 class shared_count {
 public:
-  shared_count():count_(0) 
+  shared_count():counter_(0) 
   {
   }
 
   shared_count(const shared_count& rh)
   {
-    count_ = rh.count_;
+    counter_ = rh.counter_;
   }
 
   int add_ref() 
   {
-    return count_++;
+    return __sync_add_and_fetch(&counter_, 1);
   }
 
   int sub_ref() 
   {
-    count_--;
-    return count_;
+    return __sync_sub_and_fetch(&counter_, 1);
   }
 
   int use_count()
   {
-    return count_;
+    return counter_;
   }
 
 private:
-  int count_;
+  int counter_;
 };
 
 template<class T>
