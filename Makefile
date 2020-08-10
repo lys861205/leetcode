@@ -4,6 +4,7 @@ CXXFLAGS=-g -Wreturn-type -std=c++11
 else
 CXX=g++
 CXXFLAGS=-g -std=c++11
+LDFLAGS=-lpthread
 endif
 
 GO=go
@@ -19,7 +20,7 @@ go_BINS=$(addprefix bin/, $(patsubst %.go, %, $(go_SRCS)))
 all:$(BINS) $(go_BINS)
 
 $(BINS):bin/%:%.cc
-	$(CXX) $< $(CXXFLAGS) -o $@
+	$(CXX) $< $(CXXFLAGS) -o $@ $(LDFLAGS)
 	@echo "CXX" $@
 
 $(go_BINS):bin/%:%.go
