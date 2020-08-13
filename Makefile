@@ -20,7 +20,7 @@ go_BINS=$(addprefix bin/, $(patsubst %.go, %, $(go_SRCS)))
 all:$(BINS) $(go_BINS)
 
 $(BINS):bin/%:%.cc
-	$(CXX) $< $(CXXFLAGS) -o $@ $(LDFLAGS)
+	@$(CXX) $< $(CXXFLAGS) -o $@ $(LDFLAGS)
 	@echo "CXX" $@
 
 $(go_BINS):bin/%:%.go
