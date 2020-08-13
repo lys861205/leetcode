@@ -47,24 +47,31 @@ int main()
 {
   Graph root(1);
   Graph* temp = &root;
-  for (int i=2; i < 10; ++i) {
+  for (int i=2; i < 5; ++i) {
     temp = Add(temp, i);
   }
   Graph* g1 = temp;
+  Graph* g12 = nullptr;
   for (int i=11; i < 15; ++i) {
     temp = Add(temp, i);
+    if (i==12) {
+      g12 = temp;
+    }
   }
   Graph* g2 = g1;
+  Graph* g18 = nullptr;
   for (int i=20; i > 13; --i) {
     g1 = Add(g1, i);
+    if (i==18) {
+      g18 = g1;
+    }
   }
   Graph* g3 = g2;
   for (int i=17; i > 13; --i) {
     g2 = Add(g2, i);
   }
-  for (int i=20; i > 13; i =-2) {
-    g3 = Add(g3, i);
-  }
+  g18->childs.push_back(g12);
+
   vector<int> paths;
   QueryPaths(&root, paths);
   return 0;
