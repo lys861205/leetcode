@@ -54,6 +54,16 @@ public:
     servers_.push_back(Server("10.139.20.110", 1));
   }
 
+  void Add(const Server& server)
+  {
+    servers_.push_back(server);
+  }
+
+  void Done()
+  {
+    std::sort(servers_.begin(), servers_.end());
+  }
+
   int SumWeight() 
   {
     int sum = 0;
