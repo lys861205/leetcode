@@ -49,14 +49,20 @@ class Servers {
 public:
   Servers() 
   {
-    servers_.push_back(Server("10.134.57.112", 5));
-    servers_.push_back(Server("10.139.48.96", 1));
-    servers_.push_back(Server("10.139.20.110", 1));
   }
+
+  Servers(Servers&& other):servers_(std::move(other.servers_)) {}
+
+  Servers(const Servers& other):servers_(std::move(other.servers_)) {}
 
   void Add(const Server& server)
   {
     servers_.push_back(server);
+  }
+
+  void Add(const std::string& ip, int weight)
+  {
+    servers_.push_back(Server(ip, weight));
   }
 
   void Done()
@@ -100,6 +106,10 @@ class SmoothWeight {
 public:
   SmoothWeight(){}
 
+  SmoothWeight(Servers& other):servers_(other)
+  {
+  }
+
   std::string GetConnect() 
   {
     Server s = servers_.Pick();
@@ -112,7 +122,13 @@ private:
 
 int main()
 {
-  SmoothWeight smooth;
+  Servers s;
+  s.Add("10.134.57.112", 5);
+  s.Add("10.139.48.96", 1);
+  s.Add("10.139.20.110", 1);
+
+  SmoothWeight smooth(s);
+
   for (int i=1; i < 100; ++i) {
     std::cout << "Server: " << i << " 次 " << smooth.GetConnect() << std::endl;
     if (i%7 == 0) {
