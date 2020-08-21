@@ -1,7 +1,7 @@
 #!/bin/python
 
 from redis import *
-import time
+import sys
 
 crc16tab = [
   0x0000,0x1021,0x2042,0x3063,0x4084,0x50a5,0x60c6,0x70e7,
@@ -133,7 +133,9 @@ class RedisCluster(object):
             self.nodes.append(node)
       self.__connect_master_node()
      except ResponseError, e:
-      pass
+      print("<%s:%d> %s" % (host, port, str(e)))
+      sys.exit()
+      
 
   def __connect_master_node(self):
     for node in self.nodes:
@@ -172,7 +174,8 @@ class RedisCluster(object):
     redis_cli = self.__pick_redis(name)
     return redis_cli.expire(name, time)
 
-rc = RedisCluster(host="10.139.48.96", port=7000)
+#rc = RedisCluster(host="10.139.48.96", port=7000)
+rc = RedisCluster()
 d = {'1':'java', '2': 'C++', '3': 'lua', '10':'Go', '11':'python'}
 for k in d:
   rc.hset("id:cluster", k, d[k])
