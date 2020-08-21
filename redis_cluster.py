@@ -45,11 +45,11 @@ def crc16(buf, l):
     crc &= 0xFFFF
   return crc
 
-class BitSet(object):
+class IntSet(object):
   slots = 16384
   def __init__(self):
     self.bitmap = []
-    for i in range(BitSet.slots//8):
+    for i in range(IntSet.slots//8):
       self.bitmap.append(0)
   
   def set(self, number):
@@ -72,13 +72,13 @@ class ClusterData(object):
   def __parse_slot(self, slots):
     if not self.master:
       return
-    self.bitset = BitSet()
+    self.intset = IntSet()
     for i in range(8, len(slots)):
       slot_list = slots[i].split('-')
       lo = int(slot_list[0])
       hi = int(slot_list[1])+1
       for slot in range(lo, hi):
-        self.bitset.set(slot)
+        self.intset.set(slot)
      
   def __parse_host(self, hoststr):
     hoststr = hoststr.split("@")[0]
@@ -110,7 +110,7 @@ class ClusterData(object):
     return self.master
 
   def has_slot(self, slot):
-    return self.bitset.exist(slot)
+    return self.intset.exist(slot)
 
   def __str__(self):
     return "[%s:%d]" % (self.host, self.port)
