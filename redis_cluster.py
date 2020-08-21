@@ -124,14 +124,16 @@ class RedisCluster(object):
                db=0, max_connections=None):
      self.max_connections = max_connections
      c = StrictRedis(host, port)
-     cluster_nodes = c.execute_command("cluster nodes")
      self.nodes = []
-     for line in cluster_nodes.splitlines():
-        node = ClusterData(line) 
-        if node.is_master():
-          self.nodes.append(node)
-
-     self.__connect_master_node()
+     try:
+      cluster_nodes = c.execute_command("cluster nodes")
+      for line in cluster_nodes.splitlines():
+          node = ClusterData(line) 
+          if node.is_master():
+            self.nodes.append(node)
+      self.__connect_master_node()
+     except ResponseError, e:
+      pass
 
   def __connect_master_node(self):
     for node in self.nodes:
@@ -179,6 +181,4 @@ rc.expire('id:cluster', 20)
 
 for k in d:
   print rc.get(k)
-
-
 
