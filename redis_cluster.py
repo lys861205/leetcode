@@ -61,25 +61,6 @@ class BitSet(object):
   def exist(self, number):
     return (self.bitmap[number >> 3] & (1 << (number & 7)) != 0)
 
-  def debug(self):
-    n = 0
-    for slot in self.bitmap:
-      if slot & 0x40:
-        print (n*8 + 7),
-      if slot & 0x20:
-        print (n*8 + 6),
-      if slot & 0x10:
-        print (n*8 + 5),
-      if slot & 0x08:
-        print (n*8 + 4),
-      if slot & 0x04:
-        print (n*8 + 3),
-      if slot & 0x02:
-        print (n*8 + 2),
-      if slot & 0x01:
-        print (n*8 + 1),
-      n = n+1
-
 class ClusterData(object):
   def __init__(self, data):
     info = data.split(" ")
@@ -106,10 +87,12 @@ class ClusterData(object):
     self.port = int(ip_port[1])
 
   def __parse_type(self, typestr):
-    if -1 == typestr.find("master"):
-      self.master = False
-    else:
-      self.master = True
+    node_types = typestr.split(',')
+    for typ in node_types:
+      if typ == 'slave' or typ == 'fail':
+        self.master = False
+        return
+    self.master = True
 
   def Host(self):
     return self.host
@@ -129,45 +112,37 @@ class ClusterData(object):
   def has_slot(self, slot):
     return self.bitset.exist(slot)
 
-  def debug(self):
-    return self.bitset.debug()
-
   def __str__(self):
     return "[%s:%d]" % (self.host, self.port)
 
 
-class RedisCluster(Redis):
+class RedisCluster(object):
   """
   Implementation of the Redis cluster.
   """
   def __init__(self, host="localhost", port=6379,
                db=0, max_connections=None):
-     c = StrictRedis(host, port, max_connections=5)
+     self.max_connections = max_connections
+     c = StrictRedis(host, port)
      cluster_nodes = c.execute_command("cluster nodes")
      self.nodes = []
-
      for line in cluster_nodes.splitlines():
         node = ClusterData(line) 
         if node.is_master():
           self.nodes.append(node)
 
-     self.__connect_all_master()
+     self.__connect_master_node()
 
-  def __connect_all_master(self):
-    self.clusters = {}
-    for i in range(len(self.nodes)):
-      node = self.nodes[i]
-      ctx = StrictRedis(node.Host(), node.Port())
+  def __connect_master_node(self):
+    for node in self.nodes:
+      ctx = StrictRedis(node.Host(), node.Port(), max_connections = self.max_connections)
       node.set_context(ctx)
-      self.clusters[str(node)] = node
     
   def __pick_redis(self, key):
-    crc = crc16(key, len(key)) 
-    slot = crc & (16384-1)
-    for cluster in self.clusters.values():
-      if cluster.has_slot(slot):
-        return cluster.Context()
-
+    slot = crc16(key, len(key)) & (16384-1)
+    for node in self.nodes:
+      if node.has_slot(slot):
+        return node.Context()
     return None
     
   def set(self, name, value):
@@ -178,13 +153,31 @@ class RedisCluster(Redis):
     redis_cli = self.__pick_redis(name)
     return redis_cli.get(name)
 
+  def hset(self, name, key, value):
+    redis_cli = self.__pick_redis(name)
+    return redis_cli.hset(name, key, value)
+
+  def hget(self, name, key):
+    redis_cli = self.__pick_redis(name)
+    return redis_cli.hget(name, key)
+
+  def hgetall(self, name):
+    redis_cli = self.__pick_redis(name)
+    return redis_cli.hallget(name)
+
+  def expire(self, name, time):
+    redis_cli = self.__pick_redis(name)
+    return redis_cli.expire(name, time)
+
 rc = RedisCluster(host="10.139.48.96", port=7000)
-
 d = {'1':'java', '2': 'C++', '3': 'lua', '10':'Go', '11':'python'}
-
 for k in d:
-  rc.set(k, d[k])
+  rc.hset("id:cluster", k, d[k])
+
+rc.expire('id:cluster', 20)
 
 for k in d:
   print rc.get(k)
+
+
 
