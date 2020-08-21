@@ -113,7 +113,7 @@ class ClusterData(object):
     return self.intset.exist(slot)
 
   def __str__(self):
-    return "[%s:%d]" % (self.host, self.port)
+    return "[%s %s:%d]" % (self.node_id, self.host, self.port)
 
 
 class RedisCluster(object):
@@ -135,6 +135,7 @@ class RedisCluster(object):
 
   def __connect_master_node(self):
     for node in self.nodes:
+      print(str(node))
       ctx = StrictRedis(node.Host(), node.Port(), max_connections = self.max_connections)
       node.set_context(ctx)
     
