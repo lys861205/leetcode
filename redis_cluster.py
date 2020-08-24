@@ -2,6 +2,8 @@
 
 from redis import *
 import sys
+import threading
+import time
 
 crc16tab = [
   0x0000,0x1021,0x2042,0x3063,0x4084,0x50a5,0x60c6,0x70e7,
@@ -61,24 +63,33 @@ class IntSet(object):
   def exist(self, number):
     return (self.bitmap[number >> 3] & (1 << (number & 7)) != 0)
 
+  def equal(self, other):
+    return cmp(self.bitmap, other.bitmap) == 0
+
 class ClusterData(object):
-  def __init__(self, data):
-    info = data.split(" ")
-    self.node_id = info[0]
-    self.__parse_host(info[1])
-    self.__parse_type(info[2])
-    self.__parse_slot(info)
+  def __init__(self, key, data):
+
+    self.intset = IntSet()
+    self.connected = False
+    self.node_id = data['node_id']
+    self.flag = data['flags']
+
+    self.__parse_host(key)
+    self.__parse_slot(data['slots'])
 
   def __parse_slot(self, slots):
-    if not self.master:
-      return
-    self.intset = IntSet()
-    for i in range(8, len(slots)):
-      slot_list = slots[i].split('-')
-      lo = int(slot_list[0])
-      hi = int(slot_list[1])+1
-      for slot in range(lo, hi):
-        self.intset.set(slot)
+    try:
+      if not self.master():
+        return
+      for slot in slots:
+        if len(slot) < 2:
+          continue
+        lo = int(slot[0])
+        hi = int(slot[1]) + 1
+        for s in range(lo, hi):
+          self.intset.set(s)
+    except ValueError, e:
+      print('===>', self.host, self.port, slots)
      
   def __parse_host(self, hoststr):
     hoststr = hoststr.split("@")[0]
@@ -86,13 +97,8 @@ class ClusterData(object):
     self.host = ip_port[0]
     self.port = int(ip_port[1])
 
-  def __parse_type(self, typestr):
-    node_types = typestr.split(',')
-    for typ in node_types:
-      if typ == 'slave' or typ == 'fail':
-        self.master = False
-        return
-    self.master = True
+  def NodeId(self):
+    return self.node_id
 
   def Host(self):
     return self.host
@@ -100,21 +106,42 @@ class ClusterData(object):
   def Port(self):
     return self.port
 
+  def is_connected(self):
+    return self.connected 
+
   def set_context(self, ctx):
+    self.connected = True
     self.context = ctx
+
+  def master(self):
+    if self.flag == 'master' or self.flag == 'myself,master':
+      return True
+    else:
+      return False
 
   def Context(self):
     return self.context
 
-  def is_master(self):
-    return self.master
-
   def has_slot(self, slot):
     return self.intset.exist(slot)
+
+  def equal_slot_and_assign(self, other):
+    if not self.intset.equal(other.intset):
+      self.intset = other.intset
 
   def __str__(self):
     return "[%s %s:%d]" % (self.node_id, self.host, self.port)
 
+class RedisPing(threading.Thread):
+  def __init__(self, cluster, timeout):
+    threading.Thread.__init__(self)
+    self.cluster = cluster
+    self.timeout = timeout
+
+  def run(self):
+    while True:
+      time.sleep(self.timeout)
+      self.cluster.cluster_nodes()
 
 class RedisCluster(object):
   """
@@ -122,37 +149,53 @@ class RedisCluster(object):
   """
   def __init__(self, host="localhost", port=6379,
                db=0, max_connections=None):
+     self.nodes = {}
      self.max_connections = max_connections
-     c = StrictRedis(host, port)
-     self.nodes = []
+     self.host = host
+     self.port = port
+     self.cluster_nodes()
+
+     thd = RedisPing(self, 0.5)
+     thd.start()
+
+  def cluster_nodes(self):
+     c = StrictRedis(self.host, self.port)
      try:
-      cluster_nodes = c.execute_command("cluster nodes")
-      for line in cluster_nodes.splitlines():
-          node = ClusterData(line) 
-          if node.is_master():
-            self.nodes.append(node)
+      nodes = c.execute_command("CLUSTER NODES")
+      for k in nodes:
+        if nodes[k]['connected']:
+          node = ClusterData(k, nodes[k]) 
+          if not self.nodes.has_key(node.NodeId()) and node.master():
+            self.nodes[node.NodeId()] = node
+          elif self.nodes.has_key(node.NodeId()):
+            cur_node = self.nodes[node.NodeId()]
+            cur_node.equal_slot_and_assign(node)
+
       self.__connect_master_node()
      except ResponseError, e:
-      print("<%s:%d> %s" % (host, port, str(e)))
+      print("<%s:%d> %s" % (self.host, self.port, str(e)))
       sys.exit()
-      
 
   def __connect_master_node(self):
-    for node in self.nodes:
-      print(str(node))
-      ctx = StrictRedis(node.Host(), node.Port(), max_connections = self.max_connections)
-      node.set_context(ctx)
+    for node in self.nodes.values():
+      if not node.is_connected():
+        ctx = StrictRedis(node.Host(), node.Port(), max_connections = self.max_connections)
+        node.set_context(ctx)
     
   def __pick_redis(self, key):
     slot = crc16(key, len(key)) & (16384-1)
-    for node in self.nodes:
+    for node in self.nodes.values():
       if node.has_slot(slot):
         return node.Context()
     return None
     
   def set(self, name, value):
-    redis_cli = self.__pick_redis(name)
-    return redis_cli.set(name, value)
+    try:
+      redis_cli = self.__pick_redis(name)
+      return redis_cli.set(name, value)
+    except ResponseError, e:
+      print(e)
+      return 0 
 
   def get(self, name):
     redis_cli = self.__pick_redis(name)
@@ -174,14 +217,22 @@ class RedisCluster(object):
     redis_cli = self.__pick_redis(name)
     return redis_cli.expire(name, time)
 
-#rc = RedisCluster(host="10.139.48.96", port=7000)
-rc = RedisCluster()
-d = {'1':'java', '2': 'C++', '3': 'lua', '10':'Go', '11':'python'}
+rc = RedisCluster(host="10.139.48.96", port=7000)
+
+d = {'1':'XXXXXX', '2': 'YYYYYYY', '3': 'lua', '10':'Go', '11':'python'}
 for k in d:
   rc.hset("id:cluster", k, d[k])
+
+value = raw_input('input value:')
+print(value)
+for value in range(1, 100000):
+  if rc.set('cluster:' + str(value), value) == 0:
+    rc.set('cluster:' + str(value), value)
+  time.sleep(0.5)
+print('hello')
 
 rc.expire('id:cluster', 20)
 
 for k in d:
-  print rc.get(k)
+  print rc.hget("id:cluster", k)
 
