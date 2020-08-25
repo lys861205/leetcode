@@ -25,7 +25,10 @@ int MaxSqure(int (*a)[5], int row, int col)
 int main()
 {
   int a[][5] = {
-    1,0,1,0,0,1,0,1,1,1,1,1,1,1,1,1,0,0,1,0
+    1,0,1,0,0,
+    1,0,1,1,1,
+    1,1,1,1,1,
+    1,0,0,1,0
   };
   printf("%d\n", MaxSqure(a, 4,5));
   return 0;

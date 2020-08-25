@@ -47,6 +47,11 @@ def crc16(buf, l):
     crc &= 0xFFFF
   return crc
 
+
+class MovedError(ResponseError):
+  def __init__(self, resp):
+    print(resp)
+
 class IntSet(object):
   slots = 16384
   def __init__(self):
@@ -223,16 +228,20 @@ d = {'1':'XXXXXX', '2': 'YYYYYYY', '3': 'lua', '10':'Go', '11':'python'}
 for k in d:
   rc.hset("id:cluster", k, d[k])
 
-value = raw_input('input value:')
-print(value)
-for value in range(1, 100000):
-  if rc.set('cluster:' + str(value), value) == 0:
-    rc.set('cluster:' + str(value), value)
-  time.sleep(0.5)
-print('hello')
-
 rc.expire('id:cluster', 20)
 
 for k in d:
   print rc.hget("id:cluster", k)
+
+
+print('helllo')
+conn = StrictRedis(host="10.139.48.96", port=7001)
+try:
+  print(conn.execute_command("asking"))
+  print(conn.set("test", 'ccc'))
+except MovedError as e:
+  print(e)
+
+
+
 
