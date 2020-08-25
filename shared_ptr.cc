@@ -69,7 +69,9 @@ public:
   shared_ptr& operator=(const shared_ptr& rh)
   {
     std::cout << "assign ator" << std::endl;
-    if (*this == rh) return *this;
+    if (this == &rh) return *this;
+    shared_ptr<T> dummy;
+    dummy.swap(*this);
     ptr_ = rh.ptr_;
     pn_ =  rh.pn_;
     pn_->add_ref();
@@ -135,18 +137,9 @@ private:
 
 int main()
 {
-  // shared_ptr<A> p(new A(10));
-  // shared_ptr<A> p1 = p;
-  // std::cout << p1.use_count() << std::endl;
-  // p1->test();
-  // p->test();
-  // (*p).test();
-  std::cout << "================================" << std::endl;
-  {
-    shared_ptr<A> p(new A(10));
-    p->test();
-    p.reset(new A(20));
-    p->test();
-  }
+  shared_ptr<A> p(new A(10));
+  shared_ptr<A> p1(new A(11));
+  p1 = p;
+  std::cout << p1.use_count() << std::endl;
   return 0;
 }
