@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include "Tree.h"
 #include <algorithm>
+#include <queue>
+
+using namespace std;
 
 int minDepth(Tree* root)
 {
@@ -12,6 +15,47 @@ int minDepth(Tree* root)
   int l = minDepth(root->left) + 1;
   int r = minDepth(root->right) + 1;
   return std::min(l, r);
+}
+
+int maxDepth(Tree* root)
+{
+  if (!root) return 0;
+  queue<Tree*> q;
+  q.push(root);
+  int depth = 0;
+  while (!q.empty()) {
+    int sz = q.size();
+    for (int i=0; i < sz; ++i) {
+      Tree* t = q.front();
+      q.pop();
+      if (t->left) q.push(t->left);
+      if (t->right) q.push(t->right);
+    }
+    ++depth;
+  }
+  return depth;
+}
+
+int minDepthBFS(Tree* root)
+{
+  if (!root) return 0;
+  queue<Tree*> q;
+  q.push(root);
+  int depth = 1;
+  while (!q.empty()) {
+    int sz = q.size();
+    for (int i=0; i < sz; ++i) {
+      Tree* t = q.front();
+      q.pop();
+      if (t->left == nullptr && t->right == nullptr) {
+        return depth; 
+      }
+      if (t->left) q.push(t->left);
+      if (t->right) q.push(t->right);
+    }
+    ++depth;
+  }
+  return depth;
 }
 
 int main()
@@ -33,6 +77,10 @@ int main()
   r2->left = l3;
   r2->right = r3;
 
+  Print(root, 3, '*');
+
   printf("%d\n", minDepth(root));
+  printf("%d\n", minDepthBFS(root));
+  printf("%d\n", maxDepth(root));
   return 0;
 }
