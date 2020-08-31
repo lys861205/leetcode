@@ -14,6 +14,17 @@ Node* reserve_list(Node* head)
   return pre;
 } 
 
+Node* reserve(Node* head)
+{
+  if (!head || !head->next) return head;
+  Node* new_head = reserve(head->next);
+  Node* temp = head->next;
+  temp->next = head;
+  head->next = nullptr;
+  return new_head;
+}
+
+
 int main()
 {
   Node* head = NULL;
@@ -23,7 +34,9 @@ int main()
     head = l;
   }
   Print(head);
-  head = reserve_list(head);
+  // head = reserve_list(head);
+  // Print(head);
+  head = reserve(head);
   Print(head);
   return 0;
 }
