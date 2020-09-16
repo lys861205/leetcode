@@ -38,6 +38,18 @@ Tree* BSTAppend(Tree* & root, Tree* t) {
   return root;
 }
 
+Tree* AddLeft(Tree* root, int value) {
+  if (NULL == root) return root;
+  root->left = BSTCreate(value); 
+  return root->left;
+}
+
+Tree* AddRight(Tree* root, int value) {
+  if (NULL == root) return root;
+  root->right = BSTCreate(value); 
+  return root->right;
+}
+
 Tree* BSTAdd(Tree* root, int value) {
   if (root == NULL) {
     return BSTCreate(value);
