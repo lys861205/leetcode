@@ -13,7 +13,7 @@ using namespace std;
 
 #define MEM_SIZE  128*1024*1024       //需分配内存的大小为 MEM_SIZE*sizeof(unsigned)     
 
-char* data_path="test/ip.dat";        //ip数据  
+const char* data_path="test/ip.dat";        //ip数据  
 
 //产生n个随机IP地址  
 void make_data(const int& n)

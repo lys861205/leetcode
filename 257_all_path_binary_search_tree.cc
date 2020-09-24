@@ -26,6 +26,19 @@ void AllPath(Tree* root, vector<int>& path)
   path.pop_back();
 }
 
+void searchPath(Tree* root, vector<int> path)
+{
+  if (!root) return;
+  path.push_back(root->value);
+  if (NULL == root->left && NULL == root->right) {
+    paths.push_back(path);
+    return;
+  }
+  searchPath(root->left, path);
+  searchPath(root->right, path);
+  //path.pop_back();
+}
+
 int main()
 {
   Tree* root = BSTCreate(1);
@@ -47,7 +60,8 @@ int main()
   Print(root, 3, '*');
 
   vector<int> path; 
-  AllPath(root, path);
+  //AllPath(root, path);
+  searchPath(root, path);
   for (size_t i=0; i < paths.size(); ++i) {
     printf("[");
     for (size_t j=0; j < paths[i].size(); ++j){

@@ -1,5 +1,6 @@
 /*
  * 链表排序
+ * 描述：链表排序
 */
 #include "List.h"
 Node* merge(Node* l1, Node* l2) 

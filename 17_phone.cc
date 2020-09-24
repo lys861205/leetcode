@@ -21,8 +21,7 @@ std::vector<string> backstrace(string& s, int n)
   if (n == 1) {
     string letters = map[s[0]];
     for (int i=0; i < letters.size(); ++i) {
-      string tmp(1,letters[i]);
-      v.push_back(tmp);
+      v.push_back(string(1, letters[i]));
     }
   }
   else {
