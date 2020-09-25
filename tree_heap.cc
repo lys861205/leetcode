@@ -1,12 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <algorithm>
+#include <limits.h>
 
-struct MaxHeap {
+struct Heap {
   int size;
   int curr;
-  int ele[0];
+  int* ele;
 };
+
+typedef Heap MaxHeap;
+typedef Heap MinHeap;
 
 void swin(MaxHeap* h);
 void sink(MaxHeap* h);
@@ -14,8 +18,10 @@ void sink(MaxHeap* h);
 MaxHeap* CreateHeap(int n)
 {
   //0索引不使用
-  MaxHeap* h = (MaxHeap*)malloc(sizeof(MaxHeap) + 4*(n+1)); 
+  //MaxHeap* h = (MaxHeap*)malloc(sizeof(MaxHeap) + 4*(n+1)); 
+  MaxHeap* h = (MaxHeap*)malloc(sizeof(MaxHeap));
   if (h) {
+    h->ele = (int*)malloc(4*(n+1));
     h->size = n;
     h->curr = 0;
   }
@@ -25,7 +31,9 @@ MaxHeap* CreateHeap(int n)
 bool Insert(MaxHeap* h, int value)
 {
   if (h->curr >= h->size) {
-    return false;
+    //扩容2倍
+    h->ele = (int*)realloc(h->ele, h->size * 8);
+    h->size *= 2;
   }
   h->curr++;
   h->ele[h->curr] = value;
@@ -65,21 +73,26 @@ void sink(MaxHeap* h)
 
 int Max(MaxHeap* h)
 {
-  return h->ele[1]; 
+  return h->curr >= 1 ? h->ele[1] : INT_MIN;
 }
 
-int DelMax(MaxHeap* h)
+bool DelMax(MaxHeap* h)
 {
-  int max = h->ele[1];
+  int max = Max(h);
+  if (INT_MIN == max) {
+    return false;
+  }
   std::swap(h->ele[h->curr], h->ele[1]);
   h->curr--;
   sink(h);
-  return max;
+  return true;
 }
 
 
 void ReleaseHeap(MaxHeap* h)
 {
+  free(h->ele);
+  h->size = 0;
   free(h);
 }
 
@@ -91,9 +104,10 @@ int main()
       printf("Insert failed. %d\n", i);
     }
   }
-  printf("Max value: %d\n", Max(h));
-  DelMax(h);
-  printf("Max value: %d\n", Max(h));
+  for (int i=0; i <= 13; ++i) {
+    printf("Max value: %d\n", Max(h));
+    DelMax(h);
+  }
   return 0;
 }
 
