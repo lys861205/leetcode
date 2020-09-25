@@ -17,25 +17,17 @@ using namespace std;
 void PraseString(const string& input, unordered_map<string, string>& hashmap)
 {
   enum State {
-    EUnknown = 0,
     EKeyBegin = 1,
     EColon = 2,
     EExpectBracket = 3,
     EValueBegin = 4,
     EExpectSpace = 5
   };
-  State s = EUnknown;
+  State s = EKeyBegin;
   string key;
   string value;
   for (auto & c : input) {
     switch(s) {
-      case EUnknown:
-        if (c != ' ') 
-        {
-          key.push_back(c);
-          s = EKeyBegin;
-        }
-      break;
       case EKeyBegin:
         if (c == ':') {
           s = EColon;
@@ -65,7 +57,8 @@ void PraseString(const string& input, unordered_map<string, string>& hashmap)
           hashmap[key] = value;
           key.clear();
           value.clear();
-          s = EExpectSpace;
+          //s = EExpectSpace;
+          s = EKeyBegin;
         }
         else if (c == ' ' && value.size() == 0) {
           //pass
@@ -88,7 +81,8 @@ void PraseString(const string& input, unordered_map<string, string>& hashmap)
 
 int main()
 {
-  const string s = "aa: ( 1 1 ) b bb: ( 22)  bbb:( 22)   333   444";
+  //const string s = "aa: ( 1 1 ) b bb: ( 22)  bbb:( 22)   333   444";
+  const string s = "authoruri:(13121dda0876adbb) author:(高玉胭) author:(高玉胭)湖北师范学院经济与";
   unordered_map<string, string> hm(32);
   PraseString(s, hm);
   for (auto& x : hm) {
