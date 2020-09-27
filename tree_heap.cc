@@ -101,32 +101,14 @@ void sink(Heap* h)
   }
 }
 
-int Max(MaxHeap* h)
+int top(Heap* h)
 {
   return h->curr >= 1 ? h->ele[1] : INT_MIN;
 }
 
-int Min(MinHeap* h) 
+bool pop(Heap* h)
 {
-  return h->curr >= 1 ? h->ele[1] : INT_MAX;
-}
-
-bool DelMin(MinHeap* h)
-{
-  int min = Min(h);
-  if (INT_MAX == min) {
-    return false;
-  }
-  std::swap(h->ele[h->curr], h->ele[1]);
-  h->curr--;
-  sink(h);
-  return true;
-}
-
-bool DelMax(MaxHeap* h)
-{
-  int max = Max(h);
-  if (INT_MIN == max) {
+  if (top(h) == INT_MIN) {
     return false;
   }
   std::swap(h->ele[h->curr], h->ele[1]);
@@ -145,12 +127,12 @@ int main()
 {
   printf("test Max heap ... \n");
   MaxHeap* h = CreateMaxHeap(10);
-  for (int i=0; i <= 10000000; i++) {
+  for (int i=0; i <= 100000; i++) {
     h = Insert(h, i);
   }
   for (int i=0; i <= 13; ++i) {
-    printf("Max value: %d\n", Max(h));
-    DelMax(h);
+    printf("Max value: %d\n", top(h));
+    pop(h);
   }
   ReleaseHeap(h);
 
@@ -160,8 +142,8 @@ int main()
     h = Insert(h, i);
   }
   for (int i=0; i <= 13; ++i) {
-    printf("Max value: %d\n", Min(h));
-    DelMin(h);
+    printf("Max value: %d\n", top(h));
+    pop(h);
   }
   ReleaseHeap(h);
 
