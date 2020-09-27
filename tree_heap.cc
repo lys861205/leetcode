@@ -6,28 +6,52 @@
 struct Heap {
   int size;
   int curr;
+  bool (*compare)(int, int);
   int ele[0];
 };
 
 typedef Heap MaxHeap;
 typedef Heap MinHeap;
 
-void swin(MaxHeap* h);
-void sink(MaxHeap* h);
-MaxHeap* resize(MaxHeap* h, int size);
+void swin(Heap* h);
+void sink(Heap* h);
+Heap* resize(Heap* h, int size);
 
-MaxHeap* CreateHeap(int n)
+bool greater(int x, int y)
+{
+  return x > y;
+}
+
+bool less(int x, int y)
+{
+  return x < y;
+}
+
+MaxHeap* CreateMaxHeap(int n)
+{
+  //0索引不使用
+  MinHeap* h = (MinHeap*)malloc(sizeof(MinHeap) + 4*(n+1)); 
+  if (h) {
+    h->size = n;
+    h->curr = 0;
+    h->compare = less;
+  }
+  return h;
+}
+
+MinHeap* CreateMinHeap(int n)
 {
   //0索引不使用
   MaxHeap* h = (MaxHeap*)malloc(sizeof(MaxHeap) + 4*(n+1)); 
   if (h) {
     h->size = n;
     h->curr = 0;
+    h->compare = greater;
   }
   return h;
 }
 
-MaxHeap* Insert(MaxHeap* h, int value)
+Heap* Insert(Heap* h, int value)
 {
   if (h->curr >= h->size) {
     //扩容2倍
@@ -39,7 +63,7 @@ MaxHeap* Insert(MaxHeap* h, int value)
   return h;
 }
 
-MaxHeap* resize(MaxHeap* h, int size)
+Heap* resize(Heap* h, int size)
 {
   h->size = size;
   size++;
@@ -48,11 +72,11 @@ MaxHeap* resize(MaxHeap* h, int size)
 }
 
 //上浮
-void swin(MaxHeap* h)
+void swin(Heap* h)
 {
   int N = h->curr; 
   int p = N/2;
-  while (N > 1 && h->ele[p] < h->ele[N]) {
+  while ( N > 1 && h->compare(h->ele[p], h->ele[N]) ) {
     std::swap(h->ele[p], h->ele[N]); 
     N = p;
     p = N/2;
@@ -60,17 +84,17 @@ void swin(MaxHeap* h)
 }
 
 //下沉
-void sink(MaxHeap* h)
+void sink(Heap* h)
 {
   int N = h->curr; 
   int pos = 1;
   int l = 2*pos;
   while (l <= N) {
     int r = 2*pos + 1; 
-    if (r <= N && h->ele[l] < h->ele[r]) {
+    if ( r <= N && h->compare(h->ele[l], h->ele[r]) ) {
       l = r;
     }
-    if (h->ele[l] < h->ele[pos])break;
+    if (h->compare(h->ele[l], h->ele[pos]))break;
     std::swap(h->ele[l], h->ele[pos]);
     pos = l;
     l = 2 * pos;
@@ -80,6 +104,23 @@ void sink(MaxHeap* h)
 int Max(MaxHeap* h)
 {
   return h->curr >= 1 ? h->ele[1] : INT_MIN;
+}
+
+int Min(MinHeap* h) 
+{
+  return h->curr >= 1 ? h->ele[1] : INT_MAX;
+}
+
+bool DelMin(MinHeap* h)
+{
+  int min = Min(h);
+  if (INT_MAX == min) {
+    return false;
+  }
+  std::swap(h->ele[h->curr], h->ele[1]);
+  h->curr--;
+  sink(h);
+  return true;
 }
 
 bool DelMax(MaxHeap* h)
@@ -94,7 +135,7 @@ bool DelMax(MaxHeap* h)
   return true;
 }
 
-void ReleaseHeap(MaxHeap* h)
+void ReleaseHeap(Heap* h)
 {
   h->size = 0;
   free(h);
@@ -102,7 +143,8 @@ void ReleaseHeap(MaxHeap* h)
 
 int main()
 {
-  MaxHeap* h = CreateHeap(10);
+  printf("test Max heap ... \n");
+  MaxHeap* h = CreateMaxHeap(10);
   for (int i=0; i <= 10000000; i++) {
     h = Insert(h, i);
   }
@@ -111,6 +153,18 @@ int main()
     DelMax(h);
   }
   ReleaseHeap(h);
+
+  printf("test Min heap ... \n");
+  h = CreateMinHeap(10);
+  for (int i=0; i <= 10000; i++) {
+    h = Insert(h, i);
+  }
+  for (int i=0; i <= 13; ++i) {
+    printf("Max value: %d\n", Min(h));
+    DelMin(h);
+  }
+  ReleaseHeap(h);
+
   return 0;
 }
 
