@@ -67,7 +67,7 @@ Heap* resize(Heap* h, int size)
 {
   h->size = size;
   size++;
-  h = (MaxHeap*)realloc(h, sizeof(MaxHeap) + (4*size));   
+  h = (Heap*)realloc(h, sizeof(Heap) + (4*size));   
   return h;
 }
 
@@ -142,7 +142,7 @@ int main()
     h = Insert(h, i);
   }
   for (int i=0; i <= 13; ++i) {
-    printf("Max value: %d\n", top(h));
+    printf("Min value: %d\n", top(h));
     pop(h);
   }
   ReleaseHeap(h);
