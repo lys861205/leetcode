@@ -1,4 +1,5 @@
 ## IOS的xcode工程编译
+
 1. 执行abtorw命令生成xcode工程
 ```
   sh abtorw project xcode -DIOS -t ios open
@@ -11,5 +12,12 @@
   +  模型文件
 5. 添加资源第四步的资源文件
 6. 修改Bitcode 为NO
+7. 运行
                                                                                                                                                     
 ## MAC的xcode工程编译
+
+1. 执行abtorw命令生成xcode工程
+```
+  sh abtorw project xcode
+```
+2. 运行
